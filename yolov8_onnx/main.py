@@ -40,18 +40,35 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
         # Initialize the model
-        self.model = YOLO("models/best2.pt")  # pretrained YOLOv8n model
+        self.model = YOLO("models/best_last.pt")  # pretrained YOLOv8n model
 
+    # def upload_file(self):
+    #     options = QFileDialog.Options()
+    #     file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Images (*.png *.jpg *.jpeg);;Videos (*.mp4 *.avi)", options=options)
+    #
+    #     if file_name:
+    #         if file_name.lower().endswith(('.png', '.jpg', '.jpeg')):
+    #             self.process_image(file_name)
+    #         elif file_name.lower().endswith(('.mp4', '.avi')):
+    #             self.process_video(file_name)
     def upload_file(self):
-        options = QFileDialog.Options()
-        file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Images (*.png *.jpg *.jpeg);;Videos (*.mp4 *.avi)", options=options)
+        # 修改点：添加 DontUseNativeDialog 选项
+        # 这告诉 PyQt 不要使用 Windows 系统原本的弹窗，而是用 Qt 自己的弹窗，从而避免闪退
+        options = QFileDialog.Option.DontUseNativeDialog
+
+        file_name, _ = QFileDialog.getOpenFileName(
+            self,
+            "Open File",
+            "",
+            "Images (*.png *.jpg *.jpeg);;Videos (*.mp4 *.avi)",
+            options=options
+        )
 
         if file_name:
             if file_name.lower().endswith(('.png', '.jpg', '.jpeg')):
                 self.process_image(file_name)
             elif file_name.lower().endswith(('.mp4', '.avi')):
                 self.process_video(file_name)
-
     def process_image(self, file_path):
         img = cv2.imread(file_path)
         results = self.model(img, stream=True)
